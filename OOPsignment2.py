@@ -224,3 +224,25 @@ class FrostMage(Mage):
         pass
     def iceBolck(self):
         pass
+"""
+Ranger
+"""
+class Mage(Combatant):
+    def __init__(self, name, maxHealth, health, strength, defense, ranged, magic,arrow):
+        super().__init__(name, maxHealth, health, strength, defense, ranged, magic)
+        self.__max_health = maxHealth
+        self.__health = health
+        self.__strength = strength
+        self.__defense = defense
+        self.__ranged = ranged
+        self.__magic = magic
+        self.__arrow = 3
+
+    def calculatePower(self):
+        getRanged = self.ranged
+
+
+    def resetValues(self):
+        if self.__arrow == 0:
+            self.__arrow = 3
+        return super().resetValues()
