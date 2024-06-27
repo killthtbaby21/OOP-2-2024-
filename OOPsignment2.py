@@ -131,7 +131,7 @@ class Combatant(Arena):
             return
     #受伤
     def takeDamage(self, damage):
-        damage = calculatePower()
+        self.damage = calculatePower()
         self.__health -= damage
 
 
@@ -251,7 +251,7 @@ Warrior
 """
 class Warroir(Combatant):
     def __init__(self, name, maxHealth,strength, defense, ranged, magic,armourValue):
-        super().__init__(name, maxHealth, health, strength, defense, ranged, magic)
+        super().__init__(name, maxHealth, strength, defense, ranged, magic)
         self.__max_health = maxHealth
         self.__health = maxHealth
         self.__strength = strength
@@ -263,33 +263,46 @@ class Warroir(Combatant):
         self.__armourValue = armourValue
 
     def takeDamage(self, damage):
+        damage = damage - self.__armourValue
+        if damage >= 5:
+            self.__armourValue -= 1
+        
         return super().takeDamage(damage)
+    
     def calculatePower(self):
         pass
     def resetValues(self):
-
+        self.__armourValue = 10
         return super().resetValues()
 
 #Dharok
 class Dharok(Warroir):
     def __init__(self, name, maxHealth,strength, defense, ranged, magic,armourValue):
-        super().__init__(name, maxHealth, health, strength, defense, ranged, magic,armourValue)
+        super().__init__(name, maxHealth, strength, defense, ranged, magic,armourValue)
         self.health = maxHealth
     def calculatePower(self):
-        pass    
+        self.damage = self.__strength +(self.__maxHealth -self.__health)
+        return
+    
 
 #Guthans
 class Guthans(Warroir):
     def __init__(self, name, maxHealth, strength, defense, ranged, magic,armourValue):
-        super().__init__(name, maxHealth, health, strength, defense, ranged, magic,armourValue)
+        super().__init__(name, maxHealth,  strength, defense, ranged, magic,armourValue)
         self.__health = maxHealth
     def calculatePower(self):
-        pass  
+        if self.__health<self.__maxHealth:
+            self.__health += self.__strength/5
+        self.__health = min(self.__health , self.__maxHealth)
+        return
+
+
+        
 
 #Karil
 class Karil(Warroir):
     def __init__(self, name, maxHealth, strength, defense, ranged, magic,armourValue):
-        super().__init__(name, maxHealth, health, strength, defense, ranged, magic,armourValue)
+        super().__init__(name, maxHealth, strength, defense, ranged, magic,armourValue)
         self.__health = maxHealth
     def calculatePower(self):
         pass  
