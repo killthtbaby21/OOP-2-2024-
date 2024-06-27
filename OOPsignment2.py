@@ -98,3 +98,75 @@ class Arena(Field):
             combatant1.attackEnemy(combatant2)
             combatant2.attackEnemy(combatant1)
             self.field.fieldEffect(combatant1, combatant2)
+
+"""
+Combatant
+
+"""
+
+class Combatant(Arena):
+    def __init__(self,name, maxHealth,strength,defense,ranged,magic):
+        self.name =name
+        if not isinstance(maxHealth,strength,defense,ranged,magic (int, float)):
+            raise TypeError
+        self.__maxHealth = maxHealth
+        self.__health = maxHealth
+        self.__strength = strength
+        self.__defense =defense
+        self.__ranged = ranged
+        self.__magic = magic
+    #战斗统计数据
+    def calculatePower(self):
+        return self.__strength + self.__ranged + self.__magic -self.__defense
+        
+    #攻击敌人
+    def attackEnemy(self, enemy):
+        enemy = combatant
+
+
+
+
+        if self.__health <= 0:
+            print(f"{self.name} is dead and cannot attack.")
+            return
+    #受伤
+    def takeDamage(self, damage):
+        damage = calculatePower()
+        self.__health -= damage
+
+
+        if self.__health <= 0:
+            print(f"{self.name} is dead and cannot take damage.")
+            return
+    #重生
+    def resetValues(self):
+        self.__health = self.__maxHealth
+        return self.__health
+
+    #战斗数据细节
+    def getMAxHealth(self):
+
+        return self.__maxHealth
+    
+    def getHealth(self):
+        return self.__health
+    def setHealth(self, health):
+        if health < 0:
+            raise ValueError("Health cannot be negative.")
+        self.__health = health
+    def getStrength(self):
+        
+        return self.__strength
+    def getDefense(self):
+        
+        return self.__defense
+    def getRanged(self): 
+        
+        return self.__ranged
+    def getMagic(self): 
+        return self.__magic
+    
+    #数据播报
+    def details(self):
+        print(f"Noticed：{self.name} ：Health：{self.health} \nStrength： {self.strength}\nDefense:{self.defense}\nRanged:{self.ranged}\n Magic:{self.magic} ")
+        print()
