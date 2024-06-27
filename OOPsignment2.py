@@ -170,3 +170,57 @@ class Combatant(Arena):
     def details(self):
         print(f"Noticed：{self.name} ：Health：{self.health} \nStrength： {self.strength}\nDefense:{self.defense}\nRanged:{self.ranged}\n Magic:{self.magic} ")
         print()
+
+
+"""
+Mage
+"""
+
+class Mage(Combatant):
+    def __init__(self, name, maxHealth, strength, defense, ranged,mana,regenRate):
+        super().__init__(name, maxHealth, strength, defense, ranged)
+        self.__max_health = maxHealth
+        self.__health = maxHealth
+        self.__strength = strength
+        self.__defense = defense
+        self.__ranged = ranged
+        self.__magic = mana
+        if not isinstance(mana,regenRate(int, float)):
+            raise TypeError
+        self.mana =mana
+        self.regenRate = mana/4
+
+    def calculatePower(self):
+        pass
+    def resetValues(self):
+        self.mana = self.__class__.base_mana
+        self.regenRate = self.mana / 4
+        return super().resetValues()
+#火焰法师   
+class PyroMage(Mage):
+    def __init__(self, name, maxHealth, strength, defense, ranged, mana, regenRate,flameBoost):
+        super().__init__(name, maxHealth, strength, defense, ranged, mana, regenRate)
+        self.__flameBoost = flameBoost
+        self.__magic = mana 
+
+    def castSpell(self):
+        pass
+    def castFireBlast(self):
+        pass
+    def castSuperHeat(self):
+        pass
+
+#霜冻法师
+class FrostMage(Mage):
+    def __init__(self, name, maxHealth, strength, defense, ranged, magic, mana, regenRate,iceBlock):
+        super().__init__(name, maxHealth,strength, defense, ranged, mana, regenRate)
+        self.__iceBlock = iceBlock
+        self.__magic = mana 
+    def takeDamage(self):
+        pass
+    def castSpell(self):
+        pass
+    def iceBarrage(self):
+        pass
+    def iceBolck(self):
+        pass
