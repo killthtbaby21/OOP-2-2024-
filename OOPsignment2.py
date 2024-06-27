@@ -246,3 +246,50 @@ class Mage(Combatant):
         if self.__arrow == 0:
             self.__arrow = 3
         return super().resetValues()
+"""
+Warrior
+"""
+class Warroir(Combatant):
+    def __init__(self, name, maxHealth,strength, defense, ranged, magic,armourValue):
+        super().__init__(name, maxHealth, health, strength, defense, ranged, magic)
+        self.__max_health = maxHealth
+        self.__health = maxHealth
+        self.__strength = strength
+        self.__defense = defense
+        self.__ranged = ranged
+        self.__magic = magic
+        if not isinstance(armourValue(int, float)):
+            raise TypeError
+        self.__armourValue = armourValue
+
+    def takeDamage(self, damage):
+        return super().takeDamage(damage)
+    def calculatePower(self):
+        pass
+    def resetValues(self):
+
+        return super().resetValues()
+
+#Dharok
+class Dharok(Warroir):
+    def __init__(self, name, maxHealth,strength, defense, ranged, magic,armourValue):
+        super().__init__(name, maxHealth, health, strength, defense, ranged, magic,armourValue)
+        self.health = maxHealth
+    def calculatePower(self):
+        pass    
+
+#Guthans
+class Guthans(Warroir):
+    def __init__(self, name, maxHealth, strength, defense, ranged, magic,armourValue):
+        super().__init__(name, maxHealth, health, strength, defense, ranged, magic,armourValue)
+        self.__health = maxHealth
+    def calculatePower(self):
+        pass  
+
+#Karil
+class Karil(Warroir):
+    def __init__(self, name, maxHealth, strength, defense, ranged, magic,armourValue):
+        super().__init__(name, maxHealth, health, strength, defense, ranged, magic,armourValue)
+        self.__health = maxHealth
+    def calculatePower(self):
+        pass  
