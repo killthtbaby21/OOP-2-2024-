@@ -95,11 +95,14 @@ class Arena(Field):
     def duel(self, combatant1, combatant2):
         
         if combatant1 in self.combatants and combatant2 in self.combatants and combatant1.health > 0 and combatant2.health > 0:
-            print(f"Duel between {combatant1.name} and {combatant2.name} in Arena {self.name}:")
-            for _ in range(10):  # Maximum of 10 rounds
-                self.field.applyFieldEffect([combatant1, combatant2])
-                self.fightRound(combatant1, combatant2)
-                if combatant1.health <= 0 or combatant2.health <= 0:
+            print(f"Duel between {combatant1} and {combatant2} in Arena {self.name}:")
+            for i in range(10):  # Maximum of 10 rounds
+                self.field.fieldEffect([combatant1, combatant2])
+                if combatant1.health <= 0:
+                    winner = combatant2
+                else:
+                    winner = combatant1
+                    print(f"{winner} is the winner")
                     break
             self.restoreCombatants()  # Restore health after duel
         else:
@@ -123,7 +126,8 @@ class Combatant(Arena):
         self.__magic = magic
     #战斗统计数据
     def calculatePower(self):
-        return self.__strength + self.__ranged + self.__magic -self.__defense
+        damage = self.__strength + self.__ranged + self.__magic
+        return damage
         
     #攻击敌人
     def attackEnemy(self, enemy):
@@ -195,11 +199,12 @@ class Mage(Combatant):
         self.regenRate = mana/4
 
     def calculatePower(self):
-        pass
+        damage= self.mana
+        return damage
     def resetValues(self):
-        self.mana = self.__class__.base_mana
+        self.mana = self.__magic
         self.regenRate = self.mana / 4
-        return super().resetValues()
+        return super().resetValues() 
 #火焰法师   
 class PyroMage(Mage):
     def __init__(self, name, maxHealth, strength, defense, ranged, mana, regenRate,flameBoost):
@@ -212,7 +217,11 @@ class PyroMage(Mage):
     def castFireBlast(self):
         pass
     def castSuperHeat(self):
-        pass
+        self.mana-=40
+        self.__flameBoost+=1
+    def calculatePower(self):
+        damage =(self.strength*self.__flameBoost)
+        
 
 #霜冻法师
 class FrostMage(Mage):
