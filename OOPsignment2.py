@@ -94,10 +94,16 @@ class Arena(Field):
     # 决斗
     def duel(self, combatant1, combatant2):
         
-        while combatant1.health > 0 and combatant2.health > 0:
-            combatant1.attackEnemy(combatant2)
-            combatant2.attackEnemy(combatant1)
-            self.field.fieldEffect(combatant1, combatant2)
+        if combatant1 in self.combatants and combatant2 in self.combatants and combatant1.health > 0 and combatant2.health > 0:
+            print(f"Duel between {combatant1.name} and {combatant2.name} in Arena {self.name}:")
+            for _ in range(10):  # Maximum of 10 rounds
+                self.field.applyFieldEffect([combatant1, combatant2])
+                self.fightRound(combatant1, combatant2)
+                if combatant1.health <= 0 or combatant2.health <= 0:
+                    break
+            self.restoreCombatants()  # Restore health after duel
+        else:
+            print("Invalid duel: Ensure both combatants are in the arena and have health.")
 
 """
 Combatant
@@ -121,17 +127,15 @@ class Combatant(Arena):
         
     #攻击敌人
     def attackEnemy(self, enemy):
-        enemy = combatant
-
-
-
-
-        if self.__health <= 0:
-            print(f"{self.name} is dead and cannot attack.")
+         if not isinstance(enemy, Combatant):
+            print(f"Invalid enemy: {enemy}. It must be a Combatant instance.")
             return
-    #受伤
+         if self._health <= 0:
+            print(f"{self.name} is dead and cannot attack.")
+            return   
+         print(f"{self.name} attacks {enemy.name}.") 
     def takeDamage(self, damage):
-        self.damage = calculatePower()
+        self.damage = self.calculatePower()
         self.__health -= damage
 
 
