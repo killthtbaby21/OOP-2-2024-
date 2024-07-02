@@ -180,10 +180,10 @@ class Mage(Combatant):
         return super().resetValues() 
 #火焰法师   
 class PyroMage(Mage):
-    def __init__(self, name, maxHealth, strength, defense, ranged, mana, regenRate,flameBoost):
-        super().__init__(name, maxHealth, strength, defense, ranged, mana, regenRate)
+    def __init__(self, name, maxHealth, strength, defense, ranged, magic, regenRate,flameBoost):
+        super().__init__(name, maxHealth, strength, defense, ranged, magic, regenRate)
         self.__flameBoost = flameBoost
-        self.__magic = mana
+        self.__mana = self.__magic
         self.__flameBoost = 0
         self.__bonus_damage = 0 
 
@@ -206,10 +206,10 @@ class PyroMage(Mage):
 
 #霜冻法师
 class FrostMage(Mage):
-    def __init__(self, name, maxHealth, strength, defense, ranged, magic, mana, regenRate,iceBlock):
-        super().__init__(name, maxHealth,strength, defense, ranged, mana, regenRate)
+    def __init__(self, name, maxHealth, strength, defense, ranged, magic, regenRate,iceBlock):
+        super().__init__(name, maxHealth,strength, defense, ranged, magic, regenRate)
         self.__iceBlock = iceBlock
-        self.__magic = mana 
+        self.__mana = self.__magic 
         self.iceBlock = False
         self.__bonus_damage = 0
     def takeDamage(self):
@@ -246,19 +246,21 @@ class Ranger(Combatant):
         self.__arrow = 3
 
     def calculatePower(self):
-        damage = self.ranged
-
-
-    def resetValues(self):
-        def fireArrow(self):
             if self.arrows > 0:
                 self.arrows -= 1
                 print(f"{self.name} fires an arrow!")
                 return self.ranged
             else:
-                self.__arrow = 3
                 print(f"{self.name} has no arrows left!")
                 return self.strength
+
+
+    def resetValues(self):
+        self.__arrow = 3
+        return super().resetValues()
+
+
+        
 """
 Warrior
 """
@@ -276,14 +278,20 @@ class Warroir(Combatant):
         self.__armourValue = armourValue
 
     def takeDamage(self, damage):
-        damage = damage - self.__armourValue
-        if damage >= 5:
-            self.__armourValue -= 1
+        actual_damage = max(damage - self.__defense - self.armourValue, 0)
+        self.__health -= actual_damage
+        if damage >5:
+            n = damage //5
+            self.armourValue -= 1*n  
+        if self.armourValue <= 0:
+            print(f"{self.name}'s armour has shattered!")
+            self.armourValue = 0
+        
         
         return super().takeDamage(damage)
     
     def calculatePower(self):
-        pass
+        return self.__strength
     def resetValues(self):
         self.__armourValue = 10
         return super().resetValues()
@@ -292,22 +300,22 @@ class Warroir(Combatant):
 class Dharok(Warroir):
     def __init__(self, name, maxHealth,strength, defense, ranged, magic,armourValue):
         super().__init__(name, maxHealth, strength, defense, ranged, magic,armourValue)
-        self.health = maxHealth
+        
     def calculatePower(self):
-        self.damage = self.__strength +(self.__maxHealth -self.__health)
-        return
+        bonus_damage =self.__maxHealth -self.__health
+        return super().calculatePower() + bonus_damage
     
 
 #Guthans
 class Guthans(Warroir):
     def __init__(self, name, maxHealth, strength, defense, ranged, magic,armourValue):
         super().__init__(name, maxHealth,  strength, defense, ranged, magic,armourValue)
-        self.__health = maxHealth
+        
     def calculatePower(self):
         if self.__health<self.__maxHealth:
-            self.__health += self.__strength/5
+            self.__health += self.__strength // 5
         self.__health = min(self.__health , self.__maxHealth)
-        return 
+        return super().calculatePower()
 
 
         
@@ -316,7 +324,6 @@ class Guthans(Warroir):
 class Karil(Warroir):
     def __init__(self, name, maxHealth, strength, defense, ranged, magic,armourValue):
         super().__init__(name, maxHealth, strength, defense, ranged, magic,armourValue)
-        self.__health = maxHealth
-    def calculatePower(self,damage):
-        damage = self.__strength + self.__ranged
-        return damage  
+        
+    def calculatePower(self):
+        return super().calculatePower() + self.__ranged 
