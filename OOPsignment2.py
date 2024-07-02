@@ -158,25 +158,28 @@ Mage
 """
 
 class Mage(Combatant):
-    def __init__(self, name, maxHealth, strength, defense, ranged,mana,regenRate):
+    def __init__(self, name, maxHealth, strength, defense, ranged,magic,regenRate):
         super().__init__(name, maxHealth, strength, defense, ranged)
         self.__max_health = maxHealth
         self.__health = maxHealth
         self.__strength = strength
         self.__defense = defense
         self.__ranged = ranged
-        self.__magic = mana
+        self.__magic = magic
         if not isinstance(mana,regenRate(int, float)):
             raise TypeError
-        self.mana =mana
-        self.regenRate = mana/4
+        self._mana = self.__magic
+        self._regenRate = self._mana/4
+        
+    def castSpell(self):
+        pass
 
     def calculatePower(self):
-        damage= self.mana
+        
         return damage
     def resetValues(self):
-        self.mana = self.__magic
-        self.regenRate = self.mana / 4
+        self._mana = self.__magic
+        self.regenRate = self._mana / 4
         return super().resetValues() 
 #火焰法师   
 class PyroMage(Mage):
@@ -186,18 +189,18 @@ class PyroMage(Mage):
         self.__mana = self.__magic
         self.__flameBoost = 0
         self.__bonus_damage = 0 
-
     def castSpell(self):
-        if 40 > self.mana > 10:
-            PyroMage.castFireBlast
-        elif self.mana >= 40:
-            PyroMage.castSuperHeat
+        if 40 > self._mana > 10:
+            PyroMage.castFireBlast()
+        elif self._mana >= 40:
+            PyroMage.castSuperHeat()
+        self._mana += self.regenRate
     def castFireBlast(self):
-            self.mana-=10
+            self._mana-=10
             self.__bonus_damage += 10 
             return self.__bonus_damage
     def castSuperHeat(self):
-            self.mana-=40
+            self._mana-=40
             self.__flameBoost+=1
             return self.__flameBoost
     
@@ -212,24 +215,24 @@ class FrostMage(Mage):
         self.__mana = self.__magic 
         self.iceBlock = False
         self.__bonus_damage = 0
-    def takeDamage(self):
-        pass
-    def castSpell(self):
-        if 50 > self.mana >10:
-            FrostMage.iceBarrage
-        elif self.mana >= 50:
-            FrostMage.iceBolck
+    def takeDamage(self,damage):
+        if self.iceBlock:
+            print(f"Ice Block absorbs the attack!")
+            self.iceBlock = False
         else:
-            self.mana += self.regenRate
-
+            super().takeDamage(damage)
+    def castSpell(self):
+        if 50 > self._mana >10:
+            FrostMage.iceBarrage()
+        elif self._mana >= 50:
+            FrostMage.iceBolck()
+        self._mana += self._regenRate
     def iceBarrage(self):
             self.__bonus_damage +=30
             return self.__bonus_damage
-
-
     def iceBolck(self):        
             self.iceBlock = True
-            self.mana -= 50
+            self._mana -= 50
             return self.iceBlock
 """
 Ranger
