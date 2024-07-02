@@ -126,8 +126,7 @@ class Combatant(Arena):
         self.__magic = magic
     #战斗统计数据
     def calculatePower(self):
-        damage = self.__strength + self.__ranged + self.__magic
-        return damage
+        pass
         
     #攻击敌人
     def attackEnemy(self, enemy):
@@ -210,17 +209,26 @@ class PyroMage(Mage):
     def __init__(self, name, maxHealth, strength, defense, ranged, mana, regenRate,flameBoost):
         super().__init__(name, maxHealth, strength, defense, ranged, mana, regenRate)
         self.__flameBoost = flameBoost
-        self.__magic = mana 
+        self.__magic = mana
+        self.__flameBoost = 0
+        self.__bonus_damage = 0 
 
     def castSpell(self):
         pass
     def castFireBlast(self):
-        pass
+        if 40 > self.mana > 10:
+            self.mana-=10
+            self.__bonus_damage += 10 
+            return self.__bonus_damage
     def castSuperHeat(self):
-        self.mana-=40
-        self.__flameBoost+=1
+        if self.mana >= 40:
+            self.mana-=40
+            self.__flameBoost+=1
+            return self.__flameBoost
     def calculatePower(self):
-        damage =(self.strength*self.__flameBoost)
+        damage =(self.strength*self.__flameBoost)+self.__bonus_damage
+        return damage
+    
         
 
 #霜冻法师
@@ -229,14 +237,25 @@ class FrostMage(Mage):
         super().__init__(name, maxHealth,strength, defense, ranged, mana, regenRate)
         self.__iceBlock = iceBlock
         self.__magic = mana 
+        self.iceBlock = False
+        self.__bonus_damage = 0
     def takeDamage(self):
         pass
     def castSpell(self):
         pass
+
+
     def iceBarrage(self):
-        pass
+        if 50 > self.mana >10:
+            self.__bonus_damage +=30
+            return self.__bonus_damage
+
+
     def iceBolck(self):
-        pass
+        if self.mana >= 50:
+            self.iceBlock = True
+            self.mana -= 50
+            return self.iceBlock
 """
 Ranger
 """
@@ -247,18 +266,24 @@ class Mage(Combatant):
         self.__health = health
         self.__strength = strength
         self.__defense = defense
-        self.__ranged = ranged
+        self.ranged = ranged
         self.__magic = magic
         self.__arrow = 3
 
     def calculatePower(self):
-        getRanged = self.ranged
+        damage = self.ranged
 
 
     def resetValues(self):
-        if self.__arrow == 0:
-            self.__arrow = 3
-        return super().resetValues()
+        def fireArrow(self):
+            if self.arrows > 0:
+                self.arrows -= 1
+                print(f"{self.name} fires an arrow!")
+                return self.ranged
+            else:
+                self.__arrow = 3
+                print(f"{self.name} has no arrows left!")
+                return self.strength
 """
 Warrior
 """
@@ -307,7 +332,7 @@ class Guthans(Warroir):
         if self.__health<self.__maxHealth:
             self.__health += self.__strength/5
         self.__health = min(self.__health , self.__maxHealth)
-        return
+        return 
 
 
         
@@ -317,5 +342,6 @@ class Karil(Warroir):
     def __init__(self, name, maxHealth, strength, defense, ranged, magic,armourValue):
         super().__init__(name, maxHealth, strength, defense, ranged, magic,armourValue)
         self.__health = maxHealth
-    def calculatePower(self):
-        pass  
+    def calculatePower(self,damage):
+        damage = self.__strength + self.__ranged
+        return damage  
