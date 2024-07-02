@@ -214,14 +214,15 @@ class PyroMage(Mage):
         self.__bonus_damage = 0 
 
     def castSpell(self):
-        pass
-    def castFireBlast(self):
         if 40 > self.mana > 10:
+            PyroMage.castFireBlast
+        if self.mana >= 40:
+            PyroMage.castSuperHeat
+    def castFireBlast(self):
             self.mana-=10
             self.__bonus_damage += 10 
             return self.__bonus_damage
     def castSuperHeat(self):
-        if self.mana >= 40:
             self.mana-=40
             self.__flameBoost+=1
             return self.__flameBoost
@@ -242,17 +243,17 @@ class FrostMage(Mage):
     def takeDamage(self):
         pass
     def castSpell(self):
-        pass
-
+        if 50 > self.mana >10:
+            FrostMage.iceBarrage
+        if self.mana >= 50:
+            FrostMage.iceBolck
 
     def iceBarrage(self):
-        if 50 > self.mana >10:
             self.__bonus_damage +=30
             return self.__bonus_damage
 
 
-    def iceBolck(self):
-        if self.mana >= 50:
+    def iceBolck(self):        
             self.iceBlock = True
             self.mana -= 50
             return self.iceBlock
