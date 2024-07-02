@@ -14,30 +14,23 @@ class Field:
         }
         self.changeField()
     def fieldEffect(self, combatant1, combatant2):
-        self.types[self.field_type](combatant1, combatant2)
+        if self.field_type == "Toxic Wasteland":
+            damage = 5
+            combatant1.health -= damage
+            combatant2.health -= damage
+        if self.field_type == "Healing Meadows":
+            heal_amount = 5
+            combatant1.health += heal_amount
+            combatant2.health += heal_amount
+        if self.field_type == "Castle_walls":
+            pass
+
  
     def changeField(self):
         self.field_type = random.choice(list(self.types.keys()))
     def getName(self):
         return self.__name
     
-    # Types of fields and their effects:
-    
-    def toxic_wasteland(self, combatant1, combatant2):
-        """ damages both combatants for 5 health each, ignoring any defence"""
-        damage = 5
-        combatant1.health -= damage
-        combatant2.health -= damage
-
-    def healing_meadows(self, combatant1, combatant2):
-        """heals both combatants for 5 health each (this can go over their max health"""
-        heal_amount = 5
-        combatant1.health += heal_amount
-        combatant2.health += heal_amount
-
-    def castle_walls(self, combatant1, combatant2):
-        """No effect, representing Castle Walls."""
-        pass
 
     def apply_effect(self, combatant1, combatant2):
         """Applies the current field's effect on both combatants based on field type."""
@@ -54,11 +47,9 @@ Arena
 
 """
 class Arena(Field):
-    def __init__(self, name):
-        self.name = name
-        self.combatants = []
-        self.field = Field(name)
-        self.combatants = []
+    def __init__(self):
+        self.field = Field(self.field_type)
+        
     # 加入战士  
     def add_combatant(self, combatant):
         self.combatants.append(combatant)
@@ -103,8 +94,9 @@ class Arena(Field):
                 else:
                     winner = combatant1
                     print(f"{winner} is the winner")
-                    break
-            self.restoreCombatants()  # Restore health after duel
+                    continue
+            self.restoreCombatants()
+            print(f"Noticed：{self.name} ：Health：{self.health} \nStrength： {self.strength}\nDefense:{self.defense}\nRanged:{self.ranged}\n Magic:{self.magic} ")
         else:
             print("Invalid duel: Ensure both combatants are in the arena and have health.")
 
@@ -113,7 +105,7 @@ Combatant
 
 """
 
-class Combatant(Arena):
+class Combatant:
     def __init__(self,name, maxHealth,strength,defense,ranged,magic):
         self.name =name
         if not isinstance(maxHealth,strength,defense,ranged,magic (int, float)):
@@ -175,8 +167,7 @@ class Combatant(Arena):
     
     #数据播报
     def details(self):
-        print(f"Noticed：{self.name} ：Health：{self.health} \nStrength： {self.strength}\nDefense:{self.defense}\nRanged:{self.ranged}\n Magic:{self.magic} ")
-        print()
+        return f"{self.name}, Class: {self.__class__.__name__}, Stats: Health={self.health}, Strength={self.strength}, Defence={self.defence}"
 
 
 """
@@ -216,7 +207,7 @@ class PyroMage(Mage):
     def castSpell(self):
         if 40 > self.mana > 10:
             PyroMage.castFireBlast
-        if self.mana >= 40:
+        elif self.mana >= 40:
             PyroMage.castSuperHeat
     def castFireBlast(self):
             self.mana-=10
@@ -226,9 +217,7 @@ class PyroMage(Mage):
             self.mana-=40
             self.__flameBoost+=1
             return self.__flameBoost
-    def calculatePower(self):
-        damage =(self.strength*self.__flameBoost)+self.__bonus_damage
-        return damage
+    
     
         
 
@@ -245,8 +234,10 @@ class FrostMage(Mage):
     def castSpell(self):
         if 50 > self.mana >10:
             FrostMage.iceBarrage
-        if self.mana >= 50:
+        elif self.mana >= 50:
             FrostMage.iceBolck
+        else:
+            self.mana += self.regenRate
 
     def iceBarrage(self):
             self.__bonus_damage +=30
@@ -260,7 +251,7 @@ class FrostMage(Mage):
 """
 Ranger
 """
-class Mage(Combatant):
+class Ranger(Combatant):
     def __init__(self, name, maxHealth, health, strength, defense, ranged, magic,arrow):
         super().__init__(name, maxHealth, health, strength, defense, ranged, magic)
         self.__max_health = maxHealth
