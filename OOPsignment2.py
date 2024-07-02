@@ -7,11 +7,7 @@ class Field:
     def __init__(self, name):
         self.__name = name
         self.field_type = None
-        self.types = {
-            "Toxic Wasteland": self.toxic_wasteland,
-            "Healing Meadows": self.healing_meadows,
-            "Castle Walls": self.castle_walls
-        }
+        self.types = {"Toxic Wasteland","Healing Meadows","Castle Walls"}
         self.changeField()
     def fieldEffect(self, combatant1, combatant2):
         if self.field_type == "Toxic Wasteland":
@@ -27,38 +23,26 @@ class Field:
 
  
     def changeField(self):
-        self.field_type = random.choice(list(self.types.keys()))
+        self.field_type = random.choice(list(self.types()))
     def getName(self):
-        return self.__name
+        return self.field_type
     
-
-    def apply_effect(self, combatant1, combatant2):
-        """Applies the current field's effect on both combatants based on field type."""
-        if self.field_type == "Toxic Wasteland":
-            self.toxic_wasteland(combatant1, combatant2)
-        elif self.field_type == "Healing Meadows":
-            self.healing_meadows(combatant1, combatant2)
-        elif self.field_type == "Castle Walls":
-            self.castle_walls(combatant1, combatant2)
-
 
 """
 Arena
 
 """
 class Arena(Field):
-    def __init__(self):
+    def __init__(self,combatants,field):
         self.field = Field(self.field_type)
+        self.combatants =[]
         
     # 加入战士  
     def add_combatant(self, combatant):
-        self.combatants.append(combatant)
-        # 加入战士，限制只能添加一个
-    def add_combatant(self, combatant):
-        if not self.combatants:  # 如果列表中没有这个战士
+        if combatant not in self.combatants:  # 如果列表中没有这个战士
             self.combatants.append(combatant)
         else:
-            raise ValueError("只能添加一个战士！")    
+            raise ValueError("Alreally exists.")    
     # 移除战士    
     def removeCombatant(self, combatant):
         if combatant not in self.combatants:
@@ -71,8 +55,7 @@ class Arena(Field):
             print(combatant)
     # 恢复战士生命
     def restoreCombatants(self):
-        for combatant in self.combatants:
-            combatant.health = combatant.max_health
+        Combatant.resetValues()
     #验证战士完整性
     def checkVaildCombatant(self, combatant):
         if combatant in self.combatants:
