@@ -62,7 +62,8 @@ class Arena:
             print(combatant)
     # 恢复战士生命
     def restoreCombatants(self):
-        Combatant.resetValues()
+        for combatant in self.combatants:
+            combatant.resetValues()
     #验证战士完整性
     def checkVaildCombatant(self, combatant):
         if combatant in self.combatants:
@@ -76,28 +77,33 @@ class Arena:
     # 决斗
     def duel(self, combatant1, combatant2):
         
-        if combatant1 in self.combatants and combatant2 in self.combatants and combatant1.getHealth() > 0 and combatant2.getHealth() > 0:
-            print(f"Duel between {combatant1} and {combatant2} in Arena {self.name}:")
-            print(f"Noticed：{combatant1.name}:\nHealth:{combatant1.getHealth()} \nStrength:{combatant1.getStrength()}\nDefense:{combatant1.getDefense()}\nRanged:{combatant1.getRanged()}\nMagic:{combatant1.getMagic()} ")
-            print(f"Noticed：{combatant2.name}:\nHealth:{combatant2.getHealth()} \nStrength:{combatant2.getStrength()}\nDefense:{combatant2.getDefense()}\nRanged:{combatant2.getRanged()}\nMagic:{combatant2.getMagic()} ")
-            self.field.fieldEffect(combatant1, combatant2)
-            for i in range(10): 
-                print(f"Round {i+1}") 
+        if combatant1 in self.combatants: 
+            if combatant2 in self.combatants:
+                if combatant1.getHealth() > 0 and combatant2.getHealth() > 0:
+                    print(f"Duel between {combatant1.name} and {combatant2.name} in Arena {self.name}:")
+                    print(f"{combatant1.name} is a {type(combatant1).__name__} and has the following stats:\nHealth:{combatant1.getHealth()} \nStrength:{combatant1.getStrength()}\nDefense:{combatant1.getDefense()}\nRanged:{combatant1.getRanged()}\nMagic:{combatant1.getMagic()} ")
+                    print(f"{combatant2.name} is a {type(combatant2).__name__} and has the following stats:\nHealth:{combatant2.getHealth()} \nStrength:{combatant2.getStrength()}\nDefense:{combatant2.getDefense()}\nRanged:{combatant2.getRanged()}\nMagic:{combatant2.getMagic()} ")
+                    self.field.fieldEffect(combatant1, combatant2)
+                    round_number = 1
+                    while combatant1.getHealth() > 0 and combatant2.getHealth() > 0 and round_number <= 10: 
+                        print(f"Round { round_number}")
+
+                        round_number += 1 
+                        
+                        if combatant1.getHealth() <= 0:
+                                winner = combatant2.name
+                        elif combatant2.getHealth() <= 0:
+                                winner = combatant1.name
+                        else:
+                            winner = combatant1.name if combatant1.getHealth() >= combatant2.getHealth() else combatant2.name
                 
-            if combatant1.getHealth() <= 0:
-                    winner = combatant2.name
-            elif combatant2.getHealth() <= 0:
-                    winner = combatant1.name
-            else:
-               winner = combatant1.name if combatant1.getHealth() >= combatant2.getHealth() else combatant2.name
-        
-            combatant1_health = combatant1.getHealth()
-            combatant2_health = combatant2.getHealth()    
-            print(f"{winner} is the winner")
+                    combatant1_health = combatant1.getHealth()
+                    combatant2_health = combatant2.getHealth()    
+                    print(f"{winner} is the winner")
+                    print("---------- END BATTLE ----------")
                     
-            
-        else:
-            print("Invalid duel: Ensure both combatants are in the arena and have health.")
+            else: print(f"{combatant2.name} was not found in Falador's list of fighters")
+        else:print(f"{combatant1.name} was not found in Falador's list of fighters")
 
 """
 Combatant
@@ -165,7 +171,7 @@ class Combatant(ABC):
     
     #数据播报
     def details(self):
-        return f"{self.name}, Class: {self.__class__.__name__}, Stats: Health={self.health}, Strength={self.strength}, Defence={self.defence}"
+        return f"{self.name}, Class: {self.__class__.__name__}, Stats: Health={self.__health}, Strength={self.__strength}, Defence={self.__defense}"
 
 
 """
@@ -177,14 +183,11 @@ class Mage(Combatant,ABC):
         super().__init__(name, maxHealth, strength, defense, magic,ranged)
         self.__health = maxHealth
         self._mana = magic
-        self._regenRate = self._mana//4
-        
+        self._regenRate = self._mana//4       
     def castSpell(self):
         pass
-
     def calculatePower(self):
         self.castSpell()
-
     def resetValues(self):
         self._mana = self.__magic
         self.regenRate = self._mana / 4
@@ -325,6 +328,17 @@ class Karil(Warrior):
         
     def calculatePower(self):
         return super().calculatePower() + self.__ranged 
+
+
+
+
+
+
+
+
+
+
+  
     
 # Creating the different combatant objects
 # name, maxHealth, strength, defence, mage, range and armourValue for warriors
