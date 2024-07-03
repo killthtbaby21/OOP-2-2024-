@@ -6,39 +6,42 @@ import random
 class Field:
     def __init__(self, name):
         self.__name = name
-        self.field_type = None
-        self.types = {"Toxic Wasteland","Healing Meadows","Castle Walls"}
+        self.field = None
+        self.types = ["Toxic Wasteland","Healing Meadows","Castle Walls"]
         self.changeField()
     def fieldEffect(self, combatant1, combatant2):
         if self.field_type == "Toxic Wasteland":
             damage = 5
             combatant1.health -= damage
             combatant2.health -= damage
-        if self.field_type == "Healing Meadows":
+        if self.field == "Healing Meadows":
             heal_amount = 5
             combatant1.health += heal_amount
             combatant2.health += heal_amount
-        if self.field_type == "Castle_walls":
+        if self.field == "Castle_walls":
             pass
 
  
     def changeField(self):
-        self.field_type = random.choice(list(self.types()))
+        self.field = random.choice(self.types)
     def getName(self):
-        return self.field_type
+        return self.field
     
 
 """
 Arena
 
 """
-class Arena(Field):
-    def __init__(self,combatants,field):
-        self.field = Field(self.field_type)
+class Arena:
+    def __init__(self,name):
+        self.name = name
+        f = Field("fff")
+        f.changeField()
+        self.field = f
         self.combatants =[]
         
     # 加入战士  
-    def add_combatant(self, combatant):
+    def addCombatant(self, combatant):
         if combatant not in self.combatants:  # 如果列表中没有这个战士
             self.combatants.append(combatant)
         else:
@@ -156,11 +159,11 @@ class Combatant(ABC):
 Mage
 """
 
-class Mage(Combatant):
-    def __init__(self, name, maxHealth, strength, defense, ranged):
-        super().__init__(name, maxHealth, strength, defense, ranged)
-        self._mana = self.__magic
-        self._regenRate = self._mana/4
+class Mage(Combatant,ABC):
+    def __init__(self, name, maxHealth, strength, defense, magic,ranged):
+        super().__init__(name, maxHealth, strength, defense, magic,ranged)
+        self._mana = magic
+        self._regenRate = self._mana//4
         
     def castSpell(self):
         pass
@@ -174,9 +177,9 @@ class Mage(Combatant):
         return super().resetValues() 
 #火焰法师   
 class PyroMage(Mage):
-    def __init__(self, name, maxHealth, strength, defense, magic,ranged ):
-        super().__init__(name, maxHealth, strength, defense, magic,ranged )
-        self.__mana = self.__magic
+    def __init__(self, name, maxHealth, strength, defense, magic, ranged ):
+        super().__init__(name, maxHealth, strength, defense, magic, ranged )
+        self.__mana = magic
         self.__flameBoost = 0
         self.__bonus_damage = 0 
     def castSpell(self):
@@ -201,9 +204,9 @@ class PyroMage(Mage):
 
 #霜冻法师
 class FrostMage(Mage):
-    def __init__(self, name, maxHealth, strength, defense,  magic,ranged):
+    def __init__(self, name, maxHealth, strength, defense, magic,ranged):
         super().__init__(name, maxHealth,strength, defense, magic,ranged )
-        self.__mana = self.__magic 
+        self.__mana = magic 
         self.iceBlock = False
         self.__bonus_damage = 0
     def takeDamage(self,damage):
