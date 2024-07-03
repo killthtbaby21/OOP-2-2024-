@@ -10,14 +10,18 @@ class Field:
         self.types = ["Toxic Wasteland","Healing Meadows","Castle Walls"]
         self.changeField()
     def fieldEffect(self, combatant1, combatant2):
-        if self.field_type == "Toxic Wasteland":
+        if self.field == "Toxic Wasteland":
             damage = 5
-            combatant1.health -= damage
-            combatant2.health -= damage
+            combatant1.__health = combatant1.getHealth()
+            combatant2.__health = combatant2.getHealth()
+            combatant1.__health -= damage
+            combatant2.__health -= damage
         if self.field == "Healing Meadows":
             heal_amount = 5
-            combatant1.health += heal_amount
-            combatant2.health += heal_amount
+            combatant1.__health = combatant1.getHealth()
+            combatant2.__health = combatant2.getHealth()
+            combatant1.__health += heal_amount
+            combatant2.__health += heal_amount
         if self.field == "Castle_walls":
             pass
 
@@ -64,25 +68,34 @@ class Arena:
         if combatant in self.combatants:
             if combatant.health >= 0:
                 print(f"{combatant} have the strength to fight in a war..")
-            return True
-        else:
-            raise ValueError(f"Combatant {combatant} can't fight any more.")
+                return True
+            else:
+                print(f"Combatant {combatant} can't fight any more.")
+                return False
             
     # 决斗
     def duel(self, combatant1, combatant2):
         
-        if combatant1 in self.combatants and combatant2 in self.combatants and combatant1.health > 0 and combatant2.health > 0:
+        if combatant1 in self.combatants and combatant2 in self.combatants and combatant1.getHealth() > 0 and combatant2.getHealth() > 0:
             print(f"Duel between {combatant1} and {combatant2} in Arena {self.name}:")
-            for i in range(10):  # Maximum of 10 rounds
-                self.field.fieldEffect([combatant1, combatant2])
-                if combatant1.health <= 0:
-                    winner = combatant2
-                else:
-                    winner = combatant1
-                    print(f"{winner} is the winner")
-                    continue
-            self.restoreCombatants()
-            print(f"Noticed：{self.name} ：Health：{self.health} \nStrength： {self.strength}\nDefense:{self.defense}\nRanged:{self.ranged}\n Magic:{self.magic} ")
+            print(f"Noticed：{combatant1.name}:\nHealth:{combatant1.getHealth()} \nStrength:{combatant1.getStrength()}\nDefense:{combatant1.getDefense()}\nRanged:{combatant1.getRanged()}\nMagic:{combatant1.getMagic()} ")
+            print(f"Noticed：{combatant2.name}:\nHealth:{combatant2.getHealth()} \nStrength:{combatant2.getStrength()}\nDefense:{combatant2.getDefense()}\nRanged:{combatant2.getRanged()}\nMagic:{combatant2.getMagic()} ")
+            self.field.fieldEffect(combatant1, combatant2)
+            for i in range(10): 
+                print(f"Round {i+1}") 
+                
+            if combatant1.getHealth() <= 0:
+                    winner = combatant2.name
+            elif combatant2.getHealth() <= 0:
+                    winner = combatant1.name
+            else:
+               winner = combatant1.name if combatant1.getHealth() >= combatant2.getHealth() else combatant2.name
+        
+            combatant1_health = combatant1.getHealth()
+            combatant2_health = combatant2.getHealth()    
+            print(f"{winner} is the winner")
+                    
+            
         else:
             print("Invalid duel: Ensure both combatants are in the arena and have health.")
 
@@ -162,6 +175,7 @@ Mage
 class Mage(Combatant,ABC):
     def __init__(self, name, maxHealth, strength, defense, magic,ranged):
         super().__init__(name, maxHealth, strength, defense, magic,ranged)
+        self.__health = maxHealth
         self._mana = magic
         self._regenRate = self._mana//4
         
@@ -179,7 +193,8 @@ class Mage(Combatant,ABC):
 class PyroMage(Mage):
     def __init__(self, name, maxHealth, strength, defense, magic, ranged ):
         super().__init__(name, maxHealth, strength, defense, magic, ranged )
-        self.__mana = magic
+        self.__health = maxHealth
+        self._mana = magic
         self.__flameBoost = 0
         self.__bonus_damage = 0 
     def castSpell(self):
@@ -206,6 +221,7 @@ class PyroMage(Mage):
 class FrostMage(Mage):
     def __init__(self, name, maxHealth, strength, defense, magic,ranged):
         super().__init__(name, maxHealth,strength, defense, magic,ranged )
+        self.__health = maxHealth
         self.__mana = magic 
         self.iceBlock = False
         self.__bonus_damage = 0
@@ -235,15 +251,16 @@ Ranger
 class Ranger(Combatant):
     def __init__(self, name, maxHealth, strength, defense, magic,ranged):
         super().__init__(name, maxHealth,strength, defense, magic,ranged )
+        
         self.__arrow = 3
     def calculatePower(self):
-            if self.arrows > 0:
-                self.arrows -= 1
+            if self.__arrow > 0:
+                self.__arrow -= 1
                 print(f"{self.name} fires an arrow!")
-                return self.ranged
+                return self.__ranged
             else:
                 print(f"{self.name} has no arrows left!")
-                return self.strength
+                return self.__strength
     def resetValues(self):
         self.__arrow = 3
         return super().resetValues()
@@ -254,6 +271,7 @@ Warrior
 class Warrior(Combatant):
     def __init__(self, name, maxHealth,strength, defense,  magic,ranged,armourValue):
         super().__init__(name, maxHealth, strength, defense,  magic,ranged)
+        self.__health = maxHealth
         self.__armourValue = armourValue
 
     def takeDamage(self, damage):
@@ -279,6 +297,7 @@ class Warrior(Combatant):
 class Dharok(Warrior):
     def __init__(self, name, maxHealth,strength, defense,magic, ranged, armourValue):
         super().__init__(name, maxHealth, strength, defense, ranged, magic,armourValue)
+        self.__health = maxHealth
         
     def calculatePower(self):
         bonus_damage =self.__maxHealth -self.__health
@@ -289,6 +308,7 @@ class Dharok(Warrior):
 class Guthans(Warrior):
     def __init__(self, name, maxHealth, strength, defense, magic,ranged, armourValue):
         super().__init__(name, maxHealth,  strength, defense, ranged, magic,armourValue)
+        self.__health = maxHealth
         
     def calculatePower(self):
         if self.__health<self.__maxHealth:
@@ -301,6 +321,7 @@ class Guthans(Warrior):
 class Karil(Warrior):
     def __init__(self, name, maxHealth, strength, defense, magic,ranged, armourValue):
         super().__init__(name, maxHealth, strength, defense, ranged, magic,armourValue)
+        self.__health = maxHealth
         
     def calculatePower(self):
         return super().calculatePower() + self.__ranged 
