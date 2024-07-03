@@ -88,7 +88,15 @@ class Arena:
                     while combatant1.getHealth() > 0 and combatant2.getHealth() > 0 and round_number <= 10: 
                         print(f"Round { round_number}")
                         combatant1.attackEnemy(combatant2)
+
+                        print(f"{combatant2.name}'s defence level blocked {combatant2.getDefense()} damage")
+                        print(f"{combatant2} took {combatant2.takeDamage()} damage and has {combatant2.getHealth()} health remaining")
+
                         combatant2.attackEnemy(combatant1)
+
+                        print(f"{combatant1.name}'s defence level blocked {combatant1.getDefense()} damage")
+                        print(f"{combatant1} took {combatant1.takeDamage()} damage and has {combatant1.getHealth()} health remaining")
+                        
                         round_number += 1 
                         if combatant1.getHealth() <= 0:
                                 winner = combatant2.name
@@ -127,16 +135,17 @@ class Combatant(ABC):
         
     #攻击敌人
     def attackEnemy(self, enemy):
-        if self.__health <= 0:
-            print(f"{self.name} is dead and cannot attack.")
-            return   
-        print(f"{self.name} attacks for {self.calculatePower()}.") 
-        enemy.takeDamage(self.calculatePower())
-        print(f"{enemy.name}'s defence level blocked {enemy.takeDamage(self.calculatePower())} damage")
+            print(f"{self.name} attacks for {self.calculatePower()} damage.") 
+            enemy.takeDamage(self.calculatePower())
+            
+            
+            
     def takeDamage(self, damage):
         self.damage = self.calculatePower()
         self.__health -= self.damage
-        
+      
+       
+
         
     #重生
     def resetValues(self):
