@@ -53,7 +53,7 @@ class Arena:
     # 移除战士    
     def removeCombatant(self, combatant):
         if combatant not in self.combatants:
-            raise ValueError(f"Combatant {combatant} is not in the list to be removed.")
+            print(f"Combatant {combatant} is not in the list to be removed.")
         self.combatants.remove(combatant)
      # 并确保仅能移除一个   
     # 战士出场
@@ -87,9 +87,11 @@ class Arena:
                     round_number = 1
                     while combatant1.getHealth() > 0 and combatant2.getHealth() > 0 and round_number <= 10: 
                         print(f"Round { round_number}")
-
+                        combatant1.attackEnemy(combatant2)
+                        combatant2.takeDamage(combatant1)
+                        combatant2.attackEnemy(combatant1)
+                        combatant1.takeDamage(combatant1)
                         round_number += 1 
-                        
                         if combatant1.getHealth() <= 0:
                                 winner = combatant2.name
                         elif combatant2.getHealth() <= 0:
@@ -130,18 +132,14 @@ class Combatant(ABC):
          if not isinstance(enemy, Combatant):
             print(f"Invalid enemy: {enemy}. It must be a Combatant instance.")
             return
-         if self._health <= 0:
+         if self.__health <= 0:
             print(f"{self.name} is dead and cannot attack.")
             return   
-         print(f"{self.name} attacks {enemy.name}.") 
+         print(f"{self.name} attacks for {self.calculatePower()}.") 
     def takeDamage(self, damage):
         self.damage = self.calculatePower()
-        self.__health -= damage
-
-
-        if self.__health <= 0:
-            print(f"{self.name} is dead and cannot take damage.")
-            return
+        self.__health -= self.damage
+        
     #重生
     def resetValues(self):
         self.__health = self.__maxHealth
@@ -155,7 +153,7 @@ class Combatant(ABC):
         return self.__health
     def setHealth(self, health):
         if health < 0:
-            raise ValueError("Health cannot be negative.")
+            print("Health cannot be negative.")
         self.__health = health
     def getStrength(self):
         
@@ -223,7 +221,7 @@ class PyroMage(Mage):
 #霜冻法师
 class FrostMage(Mage):
     def __init__(self, name, maxHealth, strength, defense, magic,ranged):
-        super().__init__(name, maxHealth,strength, defense, magic,ranged )
+        super().__init__(name, maxHealth,strength, defense, magic,ranged)
         self.__health = maxHealth
         self.__mana = magic 
         self.iceBlock = False
@@ -254,7 +252,7 @@ Ranger
 class Ranger(Combatant):
     def __init__(self, name, maxHealth, strength, defense, magic,ranged):
         super().__init__(name, maxHealth,strength, defense, magic,ranged )
-        
+        self.__ranged = ranged
         self.__arrow = 3
     def calculatePower(self):
             if self.__arrow > 0:
@@ -274,18 +272,20 @@ Warrior
 class Warrior(Combatant):
     def __init__(self, name, maxHealth,strength, defense,  magic,ranged,armourValue):
         super().__init__(name, maxHealth, strength, defense,  magic,ranged)
+        self.__defense = defense
+        self.__strength = strength
         self.__health = maxHealth
         self.__armourValue = armourValue
 
     def takeDamage(self, damage):
-        actual_damage = max(damage - self.__defense - self.armourValue, 0)
+        actual_damage = max(self.damage - self.__defense - self.__armourValue, 0)
         self.__health -= actual_damage
         if damage >5:
             n = damage //5
-            self.armourValue -= 1*n  
+            self.__armourValue =max(self.__armourValue- 1*n ,0) 
         if self.armourValue <= 0:
             print(f"{self.name}'s armour has shattered!")
-            self.armourValue = 0
+            
         
         
         return super().takeDamage(damage)
@@ -324,6 +324,7 @@ class Guthans(Warrior):
 class Karil(Warrior):
     def __init__(self, name, maxHealth, strength, defense, magic,ranged, armourValue):
         super().__init__(name, maxHealth, strength, defense, ranged, magic,armourValue)
+        self.__ranged = ranged
         self.__health = maxHealth
         
     def calculatePower(self):
@@ -338,8 +339,8 @@ class Karil(Warrior):
 
 
 
-  
-    
+
+
 # Creating the different combatant objects
 # name, maxHealth, strength, defence, mage, range and armourValue for warriors
 tim = Ranger("Tim", 99, 10, 10, 1, 50)
