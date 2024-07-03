@@ -87,18 +87,18 @@ class Arena(Field):
 Combatant
 
 """
+from abc import ABC
 
-class Combatant:
-    def __init__(self,name, maxHealth,strength,defense,ranged,magic):
+class Combatant(ABC):
+    def __init__(self,name, maxHealth,strength,defense,magic,ranged):
         self.name =name
-        if not isinstance(maxHealth,strength,defense,ranged,magic (int, float)):
-            raise TypeError
         self.__maxHealth = maxHealth
         self.__health = maxHealth
         self.__strength = strength
         self.__defense =defense
-        self.__ranged = ranged
         self.__magic = magic
+        self.__ranged = ranged
+        
     #战斗统计数据
     def calculatePower(self):
         pass
@@ -127,7 +127,6 @@ class Combatant:
 
     #战斗数据细节
     def getMAxHealth(self):
-
         return self.__maxHealth
     
     def getHealth(self):
@@ -158,16 +157,8 @@ Mage
 """
 
 class Mage(Combatant):
-    def __init__(self, name, maxHealth, strength, defense, ranged,magic,regenRate):
+    def __init__(self, name, maxHealth, strength, defense, ranged):
         super().__init__(name, maxHealth, strength, defense, ranged)
-        self.__max_health = maxHealth
-        self.__health = maxHealth
-        self.__strength = strength
-        self.__defense = defense
-        self.__ranged = ranged
-        self.__magic = magic
-        if not isinstance(mana,regenRate(int, float)):
-            raise TypeError
         self._mana = self.__magic
         self._regenRate = self._mana/4
         
@@ -175,17 +166,16 @@ class Mage(Combatant):
         pass
 
     def calculatePower(self):
-        
-        return damage
+        self.castSpell()
+
     def resetValues(self):
         self._mana = self.__magic
         self.regenRate = self._mana / 4
         return super().resetValues() 
 #火焰法师   
 class PyroMage(Mage):
-    def __init__(self, name, maxHealth, strength, defense, ranged, magic, regenRate,flameBoost):
-        super().__init__(name, maxHealth, strength, defense, ranged, magic, regenRate)
-        self.__flameBoost = flameBoost
+    def __init__(self, name, maxHealth, strength, defense, magic,ranged ):
+        super().__init__(name, maxHealth, strength, defense, magic,ranged )
         self.__mana = self.__magic
         self.__flameBoost = 0
         self.__bonus_damage = 0 
@@ -195,6 +185,8 @@ class PyroMage(Mage):
         elif self._mana >= 40:
             PyroMage.castSuperHeat()
         self._mana += self.regenRate
+        damage =(self.strength * self.flameBoost) + self.__bonus_damage
+        return damage
     def castFireBlast(self):
             self._mana-=10
             self.__bonus_damage += 10 
@@ -209,9 +201,8 @@ class PyroMage(Mage):
 
 #霜冻法师
 class FrostMage(Mage):
-    def __init__(self, name, maxHealth, strength, defense, ranged, magic, regenRate,iceBlock):
-        super().__init__(name, maxHealth,strength, defense, ranged, magic, regenRate)
-        self.__iceBlock = iceBlock
+    def __init__(self, name, maxHealth, strength, defense,  magic,ranged):
+        super().__init__(name, maxHealth,strength, defense, magic,ranged )
         self.__mana = self.__magic 
         self.iceBlock = False
         self.__bonus_damage = 0
@@ -227,6 +218,7 @@ class FrostMage(Mage):
         elif self._mana >= 50:
             FrostMage.iceBolck()
         self._mana += self._regenRate
+        damage = (self._mana//4)+self.__bonus_damage
     def iceBarrage(self):
             self.__bonus_damage +=30
             return self.__bonus_damage
@@ -238,16 +230,9 @@ class FrostMage(Mage):
 Ranger
 """
 class Ranger(Combatant):
-    def __init__(self, name, maxHealth, health, strength, defense, ranged, magic,arrow):
-        super().__init__(name, maxHealth, health, strength, defense, ranged, magic)
-        self.__max_health = maxHealth
-        self.__health = health
-        self.__strength = strength
-        self.__defense = defense
-        self.ranged = ranged
-        self.__magic = magic
+    def __init__(self, name, maxHealth, strength, defense, magic,ranged):
+        super().__init__(name, maxHealth,strength, defense, magic,ranged )
         self.__arrow = 3
-
     def calculatePower(self):
             if self.arrows > 0:
                 self.arrows -= 1
@@ -256,28 +241,16 @@ class Ranger(Combatant):
             else:
                 print(f"{self.name} has no arrows left!")
                 return self.strength
-
-
     def resetValues(self):
         self.__arrow = 3
         return super().resetValues()
-
-
         
 """
 Warrior
 """
-class Warroir(Combatant):
-    def __init__(self, name, maxHealth,strength, defense, ranged, magic,armourValue):
-        super().__init__(name, maxHealth, strength, defense, ranged, magic)
-        self.__max_health = maxHealth
-        self.__health = maxHealth
-        self.__strength = strength
-        self.__defense = defense
-        self.__ranged = ranged
-        self.__magic = magic
-        if not isinstance(armourValue(int, float)):
-            raise TypeError
+class Warrior(Combatant):
+    def __init__(self, name, maxHealth,strength, defense,  magic,ranged,armourValue):
+        super().__init__(name, maxHealth, strength, defense,  magic,ranged)
         self.__armourValue = armourValue
 
     def takeDamage(self, damage):
@@ -300,8 +273,8 @@ class Warroir(Combatant):
         return super().resetValues()
 
 #Dharok
-class Dharok(Warroir):
-    def __init__(self, name, maxHealth,strength, defense, ranged, magic,armourValue):
+class Dharok(Warrior):
+    def __init__(self, name, maxHealth,strength, defense,magic, ranged, armourValue):
         super().__init__(name, maxHealth, strength, defense, ranged, magic,armourValue)
         
     def calculatePower(self):
@@ -310,8 +283,8 @@ class Dharok(Warroir):
     
 
 #Guthans
-class Guthans(Warroir):
-    def __init__(self, name, maxHealth, strength, defense, ranged, magic,armourValue):
+class Guthans(Warrior):
+    def __init__(self, name, maxHealth, strength, defense, magic,ranged, armourValue):
         super().__init__(name, maxHealth,  strength, defense, ranged, magic,armourValue)
         
     def calculatePower(self):
@@ -321,12 +294,63 @@ class Guthans(Warroir):
         return super().calculatePower()
 
 
-        
-
 #Karil
-class Karil(Warroir):
-    def __init__(self, name, maxHealth, strength, defense, ranged, magic,armourValue):
+class Karil(Warrior):
+    def __init__(self, name, maxHealth, strength, defense, magic,ranged, armourValue):
         super().__init__(name, maxHealth, strength, defense, ranged, magic,armourValue)
         
     def calculatePower(self):
         return super().calculatePower() + self.__ranged 
+    
+# Creating the different combatant objects
+# name, maxHealth, strength, defence, mage, range and armourValue for warriors
+tim = Ranger("Tim", 99, 10, 10, 1, 50)
+jay = Warrior("Jay", 99, 1, 99, 1, 1, 1)
+kevin = Dharok("Kevin", 99, 45, 25, 25, 25, 10)
+zac = Guthans("Zac", 99, 45, 30, 1, 1, 10)
+jeff = Karil("Jeff", 99, 50, 40, 1, 10, 5)
+try:
+    durial = Mage("Durial", 99, 99, 99, 99, 99)
+except TypeError:
+    print("Mages must be specialized!")
+jaina = FrostMage("Jaina", 99, 10, 20, 94, 10)
+zezima = PyroMage("Zezima", 99, 15, 20, 70, 1)
+# setting up the first arena
+falador = Arena("Falador")
+falador.addCombatant(tim)
+falador.addCombatant(jeff)
+falador.listCombatants()
+# duel between ranger and karil
+falador.duel(tim, jeff)
+# showcasing incorrect duels
+falador.duel(tim, jeff)
+falador.duel(jeff, zezima)
+# showcasing restoring combatants
+falador.listCombatants()
+falador.restoreCombatants()
+falador.listCombatants()
+# showcasing removing from arena
+falador.removeCombatant(jeff)
+falador.removeCombatant(jeff)
+# setting up the second arena
+varrock = Arena("Varrock")
+varrock.addCombatant(kevin)
+varrock.addCombatant(zac)
+# duel between guthans and dharok.. note guthans does not heal on the final round as Zac was KO'd
+varrock.duel(kevin, zac)
+# setting up the third arena
+wilderness = Arena("Wilderness")
+wilderness.addCombatant(jaina)
+wilderness.addCombatant(zezima)
+# duel between a pyro and frost mage... double ko?!?!?
+wilderness.duel(jaina, zezima)
+# setting up final arena
+lumbridge = Arena("Lumbridge")
+lumbridge.addCombatant(jaina)
+lumbridge.addCombatant(jay)
+lumbridge.addCombatant(tim)
+# showcasing health carries over from arenas
+lumbridge.duel(jaina, jay)
+# showcasing a duel that takes too long...
+# tims arrows should also be reset to 3 from the restoing at the falador arena above
+lumbridge.duel(jay, tim)
