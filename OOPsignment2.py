@@ -88,9 +88,7 @@ class Arena:
                     while combatant1.getHealth() > 0 and combatant2.getHealth() > 0 and round_number <= 10: 
                         print(f"Round { round_number}")
                         combatant1.attackEnemy(combatant2)
-                        combatant2.takeDamage(combatant1)
                         combatant2.attackEnemy(combatant1)
-                        combatant1.takeDamage(combatant1)
                         round_number += 1 
                         if combatant1.getHealth() <= 0:
                                 winner = combatant2.name
@@ -129,16 +127,16 @@ class Combatant(ABC):
         
     #攻击敌人
     def attackEnemy(self, enemy):
-         if not isinstance(enemy, Combatant):
-            print(f"Invalid enemy: {enemy}. It must be a Combatant instance.")
-            return
-         if self.__health <= 0:
+        if self.__health <= 0:
             print(f"{self.name} is dead and cannot attack.")
             return   
-         print(f"{self.name} attacks for {self.calculatePower()}.") 
+        print(f"{self.name} attacks for {self.calculatePower()}.") 
+        enemy.takeDamage(self.calculatePower())
+        print(f"{enemy.name}'s defence level blocked {enemy.takeDamage(self.calculatePower())} damage")
     def takeDamage(self, damage):
         self.damage = self.calculatePower()
         self.__health -= self.damage
+        
         
     #重生
     def resetValues(self):
@@ -252,16 +250,19 @@ Ranger
 class Ranger(Combatant):
     def __init__(self, name, maxHealth, strength, defense, magic,ranged):
         super().__init__(name, maxHealth,strength, defense, magic,ranged )
+        self.__strength = strength
         self.__ranged = ranged
         self.__arrow = 3
+        self.__attacked_this_round = False
     def calculatePower(self):
-            if self.__arrow > 0:
-                self.__arrow -= 1
-                print(f"{self.name} fires an arrow!")
-                return self.__ranged
-            else:
-                print(f"{self.name} has no arrows left!")
-                return self.__strength
+        if self.__arrow > 0:
+            self.__arrow -= 1
+            return self.__ranged
+            
+        else:
+            print(f"{self.name} has no arrows left!")
+            return self.__strength
+      
     def resetValues(self):
         self.__arrow = 3
         return super().resetValues()
@@ -278,13 +279,18 @@ class Warrior(Combatant):
         self.__armourValue = armourValue
 
     def takeDamage(self, damage):
-        actual_damage = max(self.damage - self.__defense - self.__armourValue, 0)
-        self.__health -= actual_damage
-        if damage >5:
-            n = damage //5
-            self.__armourValue =max(self.__armourValue- 1*n ,0) 
-        if self.armourValue <= 0:
-            print(f"{self.name}'s armour has shattered!")
+        if self.__armourValue <= 0:
+            print(f"Armour shattered!")
+            return super().takeDamage(damage)
+        else:
+            print(f"{self.name} 's armour blocked 5 damage.")
+            actual_damage = max(damage - self.__defense - 5, 0)
+        
+            self.__health -= actual_damage
+            if damage >5:
+                n = damage //5
+                self.__armourValue =min(self.__armourValue- 1*n ,self.__armourValue) 
+        
             
         
         
