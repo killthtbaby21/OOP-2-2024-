@@ -39,7 +39,7 @@ Arena
 class Arena:
     def __init__(self,name):
         self.name = name
-        f = Field("fff")
+        f = Field("name")
         f.changeField()
         self.field = f
         self.combatants =[]
@@ -53,8 +53,8 @@ class Arena:
     # 移除战士    
     def removeCombatant(self, combatant):
         if combatant not in self.combatants:
-            print(f"Combatant {combatant} is not in the list to be removed.")
-        self.combatants.remove(combatant)
+            print(f"Combatant {combatant.name} is not in the list to be removed.")
+        else:self.combatants.remove(combatant)
      # 并确保仅能移除一个   
     # 战士出场
     def listCombatants(self):
@@ -81,27 +81,32 @@ class Arena:
             if combatant2 in self.combatants:
                 if combatant1.getHealth() > 0 and combatant2.getHealth() > 0:
                     print(f"Duel between {combatant1.name} and {combatant2.name} in Arena {self.name}:")
+
                     print(f"{combatant1.name} is a {type(combatant1).__name__} and has the following stats:\nHealth:{combatant1.getHealth()} \nStrength:{combatant1.getStrength()}\nDefense:{combatant1.getDefense()}\nRanged:{combatant1.getRanged()}\nMagic:{combatant1.getMagic()} ")
                     print(f"{combatant2.name} is a {type(combatant2).__name__} and has the following stats:\nHealth:{combatant2.getHealth()} \nStrength:{combatant2.getStrength()}\nDefense:{combatant2.getDefense()}\nRanged:{combatant2.getRanged()}\nMagic:{combatant2.getMagic()} ")
                     self.field.fieldEffect(combatant1, combatant2)
+                    
+                    #对局开始
                     round_number = 1
                     while combatant1.getHealth() > 0 and combatant2.getHealth() > 0 and round_number <= 10: 
                         print(f"Round { round_number}")
                         combatant1.attackEnemy(combatant2)
 
                         print(f"{combatant2.name}'s defence level blocked {combatant2.getDefense()} damage")
-                        print(f"{combatant2} took {combatant2.takeDamage()} damage and has {combatant2.getHealth()} health remaining")
+                        print(f"{combatant2.name} took {combatant2.calculatePower()} damage and has {combatant2.getHealth()} health remaining")
 
                         combatant2.attackEnemy(combatant1)
 
                         print(f"{combatant1.name}'s defence level blocked {combatant1.getDefense()} damage")
-                        print(f"{combatant1} took {combatant1.takeDamage()} damage and has {combatant1.getHealth()} health remaining")
+                        print(f"{combatant1.name} took {combatant1.calculatePower()} damage and has {combatant1.getHealth()} health remaining")
                         
                         round_number += 1 
                         if combatant1.getHealth() <= 0:
                                 winner = combatant2.name
+                                loser = combatant1.name
                         elif combatant2.getHealth() <= 0:
                                 winner = combatant1.name
+                                loser = combatant2.name
                         else:
                             winner = combatant1.name if combatant1.getHealth() >= combatant2.getHealth() else combatant2.name
                 
@@ -109,7 +114,11 @@ class Arena:
                     combatant2_health = combatant2.getHealth()    
                     print(f"{winner} is the winner")
                     print("---------- END BATTLE ----------")
-                    
+                    print(f"{loser} has no health to battle")
+                    print(f"{combatant1.name} is a {type(combatant1).__name__} and has the following stats:\nHealth:{combatant1.getHealth()} \nStrength:{combatant1.getStrength()}\nDefense:{combatant1.getDefense()}\nRanged:{combatant1.getRanged()}\nMagic:{combatant1.getMagic()} ")
+                    print(f"{combatant2.name} is a {type(combatant2).__name__} and has the following stats:\nHealth:{combatant2.getHealth()} \nStrength:{combatant2.getStrength()}\nDefense:{combatant2.getDefense()}\nRanged:{combatant2.getRanged()}\nMagic:{combatant2.getMagic()} ")
+                    print("----- RESTING -----")
+                    Arena.restoreCombatants(self)
             else: print(f"{combatant2.name} was not found in Falador's list of fighters")
         else:print(f"{combatant1.name} was not found in Falador's list of fighters")
 
@@ -140,10 +149,13 @@ class Combatant(ABC):
             
             
             
-    def takeDamage(self, damage):
-        self.damage = self.calculatePower()
-        self.__health -= self.damage
-      
+    def takeDamage(self, damage=None):
+       if damage is not None:
+           self.damage = damage
+       else:
+           self.damage = self.calculatePower() 
+
+       self.__health -= self.damage
        
 
         
@@ -201,17 +213,18 @@ class Mage(Combatant,ABC):
 class PyroMage(Mage):
     def __init__(self, name, maxHealth, strength, defense, magic, ranged ):
         super().__init__(name, maxHealth, strength, defense, magic, ranged )
+        self.__strength = strength
         self.__health = maxHealth
         self._mana = magic
         self.__flameBoost = 0
         self.__bonus_damage = 0 
     def castSpell(self):
         if 40 > self._mana > 10:
-            PyroMage.castFireBlast()
+            PyroMage.castFireBlast(self)
         elif self._mana >= 40:
-            PyroMage.castSuperHeat()
-        self._mana += self.regenRate
-        damage =(self.strength * self.flameBoost) + self.__bonus_damage
+            PyroMage.castSuperHeat(self)
+        self._mana += self._regenRate
+        damage =(self.__strength * self.__flameBoost) + self.__bonus_damage
         return damage
     def castFireBlast(self):
             self._mana-=10
@@ -243,7 +256,7 @@ class FrostMage(Mage):
         if 50 > self._mana >10:
             FrostMage.iceBarrage()
         elif self._mana >= 50:
-            FrostMage.iceBolck()
+            FrostMage.iceBolck(self)
         self._mana += self._regenRate
         damage = (self._mana//4)+self.__bonus_damage
     def iceBarrage(self):
@@ -269,7 +282,7 @@ class Ranger(Combatant):
             return self.__ranged
             
         else:
-            print(f"{self.name} has no arrows left!")
+
             return self.__strength
       
     def resetValues(self):
@@ -315,6 +328,7 @@ class Warrior(Combatant):
 class Dharok(Warrior):
     def __init__(self, name, maxHealth,strength, defense,magic, ranged, armourValue):
         super().__init__(name, maxHealth, strength, defense, ranged, magic,armourValue)
+        self.__maxHealth = maxHealth
         self.__health = maxHealth
         
     def calculatePower(self):
@@ -326,6 +340,7 @@ class Dharok(Warrior):
 class Guthans(Warrior):
     def __init__(self, name, maxHealth, strength, defense, magic,ranged, armourValue):
         super().__init__(name, maxHealth,  strength, defense, ranged, magic,armourValue)
+        self.__maxHealth = maxHealth
         self.__health = maxHealth
         
     def calculatePower(self):
@@ -339,6 +354,7 @@ class Guthans(Warrior):
 class Karil(Warrior):
     def __init__(self, name, maxHealth, strength, defense, magic,ranged, armourValue):
         super().__init__(name, maxHealth, strength, defense, ranged, magic,armourValue)
+        self.__maxHealth = maxHealth
         self.__ranged = ranged
         self.__health = maxHealth
         
