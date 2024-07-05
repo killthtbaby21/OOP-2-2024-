@@ -146,10 +146,10 @@ class Combatant(ABC):
             
             
             
-    def takeDamage(self, damage=None):
-        self.damage = damage if damage is not None else self.calculatePower()
-        if isinstance(self.damage, (int, float)):
-            self.__health -= self.damage
+    def takeDamage(self, damage):
+        
+        if isinstance(damage, (int, float)):
+            self.__health -= damage
         else:
             raise ValueError("Damage value must be a number.")
        
@@ -200,7 +200,8 @@ class Mage(Combatant,ABC):
     def castSpell(self):
         pass
     def calculatePower(self):
-        self.castSpell()
+        demage = self.castSpell()
+        return demage
     def resetValues(self):
         self._mana = self.__magic
         self.regenRate = self._mana / 4
@@ -250,18 +251,19 @@ class FrostMage(Mage):
             super().takeDamage(damage)
     def castSpell(self):
         if 50 > self._mana >10:
-            FrostMage.iceBarrage()
+            FrostMage.iceBarrage(self)
         elif self._mana >= 50:
             FrostMage.iceBolck(self)
         self._mana += self._regenRate
-        damage = (self._mana//4)+self.__bonus_damage
+        damage = (self._mana/4)+self.__bonus_damage
+        return damage
     def iceBarrage(self):
             self.__bonus_damage +=30
             return self.__bonus_damage
     def iceBolck(self):        
             self.iceBlock = True
             self._mana -= 50
-            return self.iceBlock
+            return self._mana
 """
 Ranger
 """
