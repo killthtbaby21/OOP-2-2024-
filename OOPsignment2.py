@@ -62,8 +62,7 @@ class Arena:
             print(combatant)
     # 恢复战士生命
     def restoreCombatants(self):
-        for combatant in self.combatants:
-            combatant.resetValues()
+         print("----- RESTING -----")
     #验证战士完整性
     def checkVaildCombatant(self, combatant):
         if combatant in self.combatants:
@@ -117,8 +116,6 @@ class Arena:
                     print(f"{loser} has no health to battle")
                     print(f"{combatant1.name} is a {type(combatant1).__name__} and has the following stats:\nHealth:{combatant1.getHealth()} \nStrength:{combatant1.getStrength()}\nDefense:{combatant1.getDefense()}\nRanged:{combatant1.getRanged()}\nMagic:{combatant1.getMagic()} ")
                     print(f"{combatant2.name} is a {type(combatant2).__name__} and has the following stats:\nHealth:{combatant2.getHealth()} \nStrength:{combatant2.getStrength()}\nDefense:{combatant2.getDefense()}\nRanged:{combatant2.getRanged()}\nMagic:{combatant2.getMagic()} ")
-                    print("----- RESTING -----")
-                    Arena.restoreCombatants(self)
             else: print(f"{combatant2.name} was not found in Falador's list of fighters")
         else:print(f"{combatant1.name} was not found in Falador's list of fighters")
 
@@ -150,12 +147,11 @@ class Combatant(ABC):
             
             
     def takeDamage(self, damage=None):
-       if damage is not None:
-           self.damage = damage
-       else:
-           self.damage = self.calculatePower() 
-
-       self.__health -= self.damage
+        self.damage = damage if damage is not None else self.calculatePower()
+        if isinstance(self.damage, (int, float)):
+            self.__health -= self.damage
+        else:
+            raise ValueError("Damage value must be a number.")
        
 
         
